@@ -1,0 +1,39 @@
+service: serverless-aws-app-template
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  memorySize: 192
+
+plugins:
+  - serverless-offline
+  - serverless-domain-manager
+  - serverless-apigw-binary
+custom:
+  customDomain:
+    # [{Modificar - Dominio en el que se trabajará }]
+    domainName: example.com
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+  apigwBinary:
+    types:
+      - '*/*'
+
+functions:
+  app:
+    iamRoleConfig:
+    # [{Modificar - Rol IAM de AWS}]
+      roleId: dteapirole
+    handler: app.app
+    events: 
+      - http: 
+          path: / 
+          method: ANY
+          cors: true
+          contentHandling: CONVERT_TO_BINARY
+      - http: 
+          path: /{proxy+}
+          method: ANY
+          cors: true
+          contentHandling: CONVERT_TO_BINARY

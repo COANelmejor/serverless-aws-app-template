@@ -1,0 +1,39 @@
+                <footer class="row tm-mt-small">
+                    <div class="col-12 font-weight-light text-center">
+                        <p class="d-inline-block tm-bg-black text-white py-2 px-4">
+                            Copyright &copy; RCESoftGroup
+                        </p>
+                    </div>
+                </footer>
+                </div>
+                </div>
+                <script src="https://cdndte.s3.amazonaws.com/dashboard/js/jquery-3.3.1.min.js"></script>
+                <!-- https://jquery.com/download/ -->
+                <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+                <!-- https://momentjs.com/ -->
+                <script src="https://cdndte.s3.amazonaws.com/dashboard/js/utils.js"></script>
+                <script src="https://cdndte.s3.amazonaws.com/dashboard/js/Chart.min.js"></script>
+                <!-- http://www.chartjs.org/docs/latest/ -->
+                <script src="https://cdndte.s3.amazonaws.com/dashboard/js/fullcalendar.min.js"></script>
+                <!-- https://fullcalendar.io/ -->
+                <script src="https://cdndte.s3.amazonaws.com/dashboard/js/bootstrap.min.js"></script>
+                <!-- https://getbootstrap.com/ -->
+                <script src="https://cdndte.s3.amazonaws.com/dashboard/js/tooplate-scripts.js"></script>
+                <script>
+                    $(document).ready(function () {
+                        $('#logout').click(function () {
+                            $.ajax({
+                                method: "GET",
+                                url: '/api/logout',
+                                success: function (response) {
+                                    console.log(response);
+                                    location.href = "/";
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    console.log(response);
+                                }
+                            })
+
+                        })
+                    })
+                </script>

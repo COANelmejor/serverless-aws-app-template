@@ -1,0 +1,105 @@
+<% include ../views_template_v2/dashboard_top %>
+
+<!-- row -->
+<div class="row tm-content-row tm-mt-big">
+    <div class="col-lg-8 col-md-10 col-sm-12 offset-lg-2 offset-md-1">
+        <div id="color_fondo" class="bg-light tm-block borde-curvo">
+            <div class="input-group mb-3">
+                <div class="input-group">
+                    <div class="col-lg-8 offset-lg-2">
+                        <h3 class="text-center">Agregar Producto/Servicio</h3>
+                        <div class="form">
+                            <div class="row">
+                                <div class="col l8 m12 s12">
+                                    <div class="input-field">
+                                        <i class="fas fa-box prefix"></i>
+                                        <input type="text" class="validate" id="nombre" required>
+                                        <label for="nombre">Nombre</label>
+                                    </div>
+
+                                </div>
+                                <div class="col l4 m12 s12">
+                                    <div class="col s6">
+                                        <p>
+                                            <label>
+                                                <input id="bos_bien" checked value="bien" name="bos" required
+                                                    type="radio" />
+                                                <span for="bos_bien">Producto</span>
+                                            </label>
+                                        </p>
+
+                                    </div>
+                                    <div class="col s6">
+
+                                        <p>
+                                            <label>
+                                                <input id="bos_servicio" value="servicio" name="bos" required
+                                                    type="radio" />
+                                                <span for="bos_servicio">Servicio</span>
+                                            </label>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col s12">
+                                <div class="input-field">
+                                    <i class="prefix" style="top: 0px;">Q.</i>
+                                    <input type="number" min="0" step="0.01" required class=" form-control"
+                                        id="precio_unitario">
+                                    <label for="precio_unitario">Precio</label>
+                                </div>
+                            </div>
+                            <div class="col l4 offset-l4 m12 s12 text-center">
+                                <a id="guardar" class="waves-effect waves-light btn-large">
+                                    <i class="material-icons left">add</i>
+                                    Guardar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<h4 class="text-center" id="respuesta"></h4>
+<% include ../views_template_v2/dashboard_bot %>
+
+<script>
+    $(document).ready(function () {
+        console.log('YEY');
+        $('#guardar').click(function () {
+            let bs = $("input[name='bos']:checked").val();
+            let nombre = $('#nombre').val();
+            let precio_unitario = $('#precio_unitario').val();
+
+            let info = {
+                bs: bs,
+                descripcion: nombre,
+                precio_unitario: precio_unitario
+            }
+            $.ajax({
+                method: "POST",
+                url: '/api/items/',
+                data: info,
+                success: function (response) {
+                    console.log(response);
+                    $('#respuesta').html('<i class="fas fa-check-square" style="color: #43a047"></i> Ítem creado con éxito.')
+                    setTimeout(function () {
+                        location.href = "/items"
+                    }, 2000);
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                    $('#respuesta').html('<i class="fas fa-window-close" style="color: #e53935"></i> Hubo un error, verificar campos')
+                }
+            })
+
+        })
+    })
+</script>
+
+<% include ../views_template_v2/dashboard_bot_2 %>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title><%= title%></title>
+    <meta name="theme-color" content="#29b6f6" />
+    <link rel="shortcut icon" href="https://cdndte.s3.amazonaws.com/dashboard/fav_icon/favicon_2.ico" type="image/x-icon">
+    <link rel="icon" href="https://cdndte.s3.amazonaws.com/dashboard/fav_icon/favicon_2.ico" type="image/x-icon">
+
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://cdndte.s3.amazonaws.com/stylesheets/style_material.css" type="text/css" rel="stylesheet"
+        media="screen,projection" />
+    <link href="https://cdndte.s3.amazonaws.com/stylesheets/util.css" type="text/css" rel="stylesheet"
+        media="screen,projection" />
+    <link rel="stylesheet" href="https://cdndte.s3.amazonaws.com/dashboard/css/fontawesome.min.css">
+    <link rel="stylesheet" href="https://cdndte.s3.amazonaws.com/javascripts/int_input/intlTelInput.css">
+    <link rel="stylesheet" href="https://cdndte.s3.amazonaws.com/javascripts/int_input/demo.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large waves-effect waves-light" href="/ordenes/nuevo">
+            <i class="material-icons">
+                receipt
+            </i> </a>
+    </div>
+
+    <nav class="light-blue light" role="navigation">
+        <div class="nav-wrapper container">
+            <a id="logo-container" href="/dashboard" class="brand-logo">
+                <img src="https://cdndte.s3.amazonaws.com/dashboard/img/logos/Logo16_9_.png" width="110px"
+                    alt="logo_16">
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li class="">
+                    <a class="" href="/dashboard">Inicio</a>
+                </li>
+                <li class="">
+                    <a class="" href="/items">Productos y Servicios</a>
+                </li>
+                <li class="">
+                    <a class="" href="/ordenes">Órdenes de Compra</a>
+                </li>
+                <li>
+                    <a class="btn red darken-2 btn-block waves-effect logout">
+                        <i class="material-icons">input</i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+
+                </li>
+            </ul>
+            <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+        </div>
+    </nav>
+
+    <ul id="slide-out" class="sidenav">
+        <li>
+            <div class="user-view">
+                <div class="background light-blue accent-3">
+                    <img width="100%" src="https://cdndte.s3.amazonaws.com/dashboard/img/logos/Logo16_9_.png">
+                </div>
+                <a><img class="circle" src="https://cdndte.s3.amazonaws.com/dashboard/img/user_male.png"></a>
+                <a><span class="white-text name"><%= user.nombre%></span></a>
+                <a><span class="white-text email"><%= user.username%></span></a>
+            </div>
+        </li>
+        <li class="nav-item waves-effect">
+            <a class="nav-link" href="/dashboard"><i class="material-icons">home</i> Inicio</a>
+        </li>
+        <li class="nav-item waves-effect">
+            <a class="nav-link" href="/perfil"><i class="material-icons">account_circle</i> Mi Perfil</a>
+        </li>
+        <li class="nav-item waves-effect">
+            <a class="nav-link" href="/items"><i class="material-icons">widgets</i> Productos y Servicios</a>
+        </li>
+        <li class="nav-item waves-effect">
+            <a class="nav-link" href="/ordenes"><i class="material-icons">receipt</i> Órdenes de Compra</a>
+        </li>
+        <li class="nav-item ">
+            <a href="#" id="" class="btn red darken-1 btn-block waves-effect logout">
+                <i class="material-icons">input</i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </li>
+
+        <div class="footer-nav orange">
+            <div class="container">
+                <a class="white-text" href="https://rcesoftgroup.com/"> <i class="material-icons">copyright</i> <span
+                        style="position: relative; bottom: 7px;">RCE SoftGroup</span></a>
+            </div>
+        </div>
+    </ul>
+    <div class="container">

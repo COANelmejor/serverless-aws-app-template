@@ -1,0 +1,59 @@
+<% include login_up %>
+
+<div class="limiter">
+    <div id="color_fondo" class="container-login100">
+        <div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-50">
+            <span class="login100-form-title p-b-22">
+                Registrar Usuario
+            </span>
+
+            <div class="input-group mb-3">
+                <input type="email" id="username" class="form-control" placeholder="Correo Electrónico">
+            </div>
+            <div class="input-group mb-3">
+                <input type="text" id="nombre" class="form-control" placeholder="Nombre Completo">
+            </div>
+            <div class="input-group mb-3">
+                <input type="password" id="password" class="form-control" placeholder="Contraseña">
+            </div>
+            <div class="m-4">
+                <button id="signin" class="btn btn-primary btn-block btn-lg">
+                    Registrarse
+                </button>
+            </div>
+            <p class="text-center" id="respuesta"></p>
+        </div>
+    </div>
+</div>
+<%include login_bot%>
+
+<script>
+    $('#signin').click(function () {
+        let info = {
+            username: $('#username').val(),
+            password: $('#password').val(),
+            nombre: $('#nombre').val(),
+        }
+        $.ajax({
+            method: "POST",
+            url: 'https://api.dte.gt/register',
+            data: info,
+            success: function (message) {
+                console.log(message.message);
+                $('#respuesta').html(message.message)
+                $('#color_fondo').removeClass('container-login100')
+                $('#color_fondo').addClass('login_success')
+                setTimeout(function () {
+                    window.location.href = "https://dte.gt";
+                }, 2000);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('#respuesta').html('Hubo un error en la Creación del Usuario, verificar campos')
+                $('#color_fondo').removeClass('container-login100')
+                $('#color_fondo').addClass('login_fail')
+            }
+        })
+    })
+</script>
+
+<%include login_bot_2%>

@@ -1,0 +1,43 @@
+    </div>
+    <div class="footer-copyright">
+        <div class="container">
+            <a class="white-text" href="http://materializecss.com"> <i class="material-icons">copyright</i> <span
+                    style="position: relative; bottom: 6px;">RCE SoftGroup</span></a>
+        </div>
+    </div>
+
+    </footer>
+
+
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script src="https://cdndte.s3.amazonaws.com/javascripts/int_input/intlTelInput.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('.logout').click(function () {
+                $.ajax({
+                    method: "GET",
+                    url: '/api/logout',
+                    success: function (response) {
+                        console.log(response);
+                        location.href = "/";
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(response);
+                    }
+                })
+
+            })
+            $(function () {
+
+                $('.sidenav').sidenav();
+                $('.fixed-action-btn').floatingActionButton();
+
+            }); // end of document ready
+
+        })
+    </script>

@@ -1,0 +1,359 @@
+<% include ../views_template_v2/dashboard_top %>
+
+<!-- row -->
+<div class="row tm-content-row tm-mt-big">
+    <div class="col-12">
+        <div class="bg-white tm-block h-100">
+            <div class="row">
+                <div class="col-6">
+                    <h2 class="tm-block-title">
+                        <h3 class="text-center">Productos y Servicios
+                            <a href="/items/nuevo" class="btn btn-success"><i
+                                    class="material-icons">add_circle_outline</i>
+                            </a>
+                        </h3>
+                    </h2>
+                </div>
+                <div class="col-6">
+                    <div class="file-field input-field">
+                        <div class="">
+                            <button class="btn btn-outline-secondary" type="button" id="boton_buscar"><i
+                                    class="material-icons">search</i></button>
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input type="text" class="form-control" id="campo_buscar" placeholder="Buscar Item"
+                                aria-label="Buscar Item" aria-describedby="button-addon2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+
+                    <thead>
+                        <th class="text-center">Descripción</th>
+                        <th class="text-center">Tipo</th>
+                        <th class="text-center">Precio Unitario</th>
+                        <th class="text-center"><i class="fas fa-cog"></i></th>
+                    </thead>
+                    <tbody id="body_table_items">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal_eliminar" class="modal">
+    <div class="modal-content">
+        <h5 class="text-center">Estás seguro que deseas eliminar el ítem:</h5>
+        <h2 id="descripcion" class="text-center"></h2>
+        <h4 class="text-center">Con el precio:</h4>
+        <h2 class="text-center">Q. <span id="precio"></span></h2>
+
+        <div class="text-center">
+            <a class="btn red darken-1" id="boton_eliminar">Eliminar</a>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn modal-close blue-grey darken-1" data-dismiss="modal">Cerrar</button>
+    </div>
+</div>
+
+<% include ../views_template_v2/dashboard_bot %>
+
+<script>
+    var item_agregado = 0;
+    $(document).ready(function () {
+        console.log('YEY');
+
+        $('#boton_buscar').click(
+            buscar_items
+        )
+        $('#campo_buscar').keyup(function (event) {
+            if (event.key == 'Enter') {
+                buscar_items()
+            }
+        })
+
+        function buscar_items() {
+            let item = $('#campo_buscar').val();
+            console.log(item);
+
+            $.ajax({
+                method: "GET",
+                url: '/api/items/buscar/' + item,
+                data: item,
+                success: function (response) {
+                    console.log(response);
+                    $('#body_table_items').html('')
+                    for (let p = 0; p < response.length; p++) {
+                        const item = response[p];
+                        $('#body_table_items').append(` <tr id="tr_${item._id}" value="${item._id}"
+                            list=${item_agregado}>
+                            <td class="text-center">
+                        <a href="/items/ver?item=${item._id}">
+                            ${item.descripcion}
+                        </a>
+                            </td>
+                            <td>
+                                ${item.bs}
+                            </td>
+                            <td class="text-right">
+                                <span class="left-align">Q.</span> ${item.precio_unitario.toFixed(2)}
+                            </td>
+                            <td class="text-center">
+                                <a class="btn waves-effect waves-light blue darken-1" href="/items/ver?item=${item._id}">
+                                                    <i class="material-icons">remove_red_eye</i>
+                                </a>
+                        <button class="btn waves-effect boton_abrir_modal waves-light red darken-1 modal-trigger"
+                            data-target="modal_eliminar" item_id="${item._id}">
+                            <i class="material-icons">delete</i>
+                        </button>
+
+                            </td>
+                        </tr>`)
+                    }
+                    $('.boton_abrir_modal').click(function () {
+                        var id_item = $(this).attr('item_id');
+
+                        console.log(id_item);
+
+
+                        $.ajax({
+                            type: "GET",
+                            url: '/api/items/' + id_item,
+                            success: function (response) {
+                                console.log(response);
+                                $('#nombre_item').html('Tipo ' + response.bs)
+                                $('#descripcion').html(response.descripcion)
+                                $('#precio').html(response.precio_unitario
+                                    .toFixed(2))
+                                $('#boton_eliminar').attr('item_id',
+                                    response._id)
+                            },
+                            error: function (jqXHR, textStatus, errorThrown, ) {
+                                console.log(jqXHR);
+                                console.log(textStatus);
+                                console.log(errorThrown);
+                            }
+                        });
+                    })
+                    $('#boton_eliminar').click(function () {
+                        var id_item = $(this).attr('item_id')
+                        console.log(id_item);
+
+                        $.ajax({
+                            type: "DELETE",
+                            url: '/api/items/' + id_item,
+                            success: function (response) {
+                                $('#tr_' + id_item).remove()
+                                $('#modal_eliminar').modal('close')
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                console.log(jqXHR);
+                                console.log(textStatus);
+                                console.log(errorThrown);
+                            }
+                        });
+                    })
+
+
+                },
+                error: function () {
+                    $.ajax({
+                        method: "GET",
+                        url: '/api/items/?limit=100&skip=0',
+                        success: function (response) {
+                            $('#body_table_items').html('')
+                            for (let p = 0; p < response.length; p++) {
+                                const item = response[p];
+                                $('#body_table_items').append(` <tr
+            id="tr_${item._id}" value="${item._id}" list=${item_agregado}>
+            <td class="text-center">
+                        <a href="/items/ver?item=${item._id}">
+                            ${item.descripcion}
+                        </a>
+            </td>
+            <td>
+                ${item.bs}
+            </td>
+            <td class="text-right">
+                <span class="left-align">Q.</span> ${item.precio_unitario.toFixed(2)}
+            </td>
+            <td class="text-center">
+            
+                <a class="btn waves-effect waves-light blue darken-1" href="/items/ver?item=${item._id}">
+                    <i class="material-icons">remove_red_eye</i>
+                </a>
+                        <button class="btn waves-effect boton_abrir_modal waves-light red darken-1 modal-trigger"
+                            data-target="modal_eliminar" item_id="${item._id}">
+                            <i class="material-icons">delete</i>
+                        </button>
+                        
+            </td>
+            </tr>`)
+                                item_agregado++
+                            }
+                            $('.boton_abrir_modal').click(function () {
+                                var id_item = $(this).attr('item_id');
+
+                                console.log(id_item);
+
+
+                                $.ajax({
+                                    type: "GET",
+                                    url: '/api/items/' + id_item,
+                                    success: function (response) {
+                                        console.log(response);
+                                        $('#nombre_item').html(
+                                            'Tipo ' + response
+                                            .bs)
+                                        $('#descripcion').html(
+                                            response.descripcion
+                                        )
+                                        $('#precio').html(response
+                                            .precio_unitario
+                                            .toFixed(2))
+
+                                        $('#boton_eliminar').attr(
+                                            'item_id',
+                                            response._id)
+                                    },
+                                    error: function (jqXHR, textStatus,
+                                        errorThrown, ) {
+                                        console.log(jqXHR);
+                                        console.log(textStatus);
+                                        console.log(errorThrown);
+                                    }
+                                });
+                            })
+                            $('#boton_eliminar').click(function () {
+                                var id_item = $(this).attr('item_id')
+                                console.log(id_item);
+
+                                $.ajax({
+                                    type: "DELETE",
+                                    url: '/api/' +
+                                        id_item,
+                                    success: function (response) {
+                                        $('#tr_' +
+                                                id_item)
+                                            .remove()
+                                        $('#modal_eliminar').modal(
+                                            'close')
+                                    },
+                                    error: function (jqXHR, textStatus,
+                                        errorThrown) {
+                                        console.log(jqXHR);
+                                        console.log(textStatus);
+                                        console.log(errorThrown);
+                                    }
+                                });
+                            })
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(jqXHR);
+                            console.log(textStatus);
+                            console.log(errorThrown);
+                        }
+                    })
+                }
+            });
+
+        }
+        $('.modal').modal();
+
+
+        let nombre = $(this).val()
+        $.ajax({
+            method: "GET",
+            url: '/api/items/?limit=100&skip=0',
+            success: function (response) {
+                $('#body_table_items').html('')
+                for (let p = 0; p < response.length; p++) {
+                    const item = response[p];
+                    $('#body_table_items').append(` <tr
+                    id="tr_${item._id}" value="${item._id}" list=${item_agregado}>
+                    <td class="text-center">
+                        <a href="/items/ver?item=${item._id}">
+                            ${item.descripcion}
+                        </a>
+                    </td>
+                    <td>
+                        ${item.bs}
+                    </td>
+                    <td class="text-right">
+                        <span class="left-align">Q.</span> ${item.precio_unitario.toFixed(2)}
+                    </td>
+                    <td class="text-center">
+                        <a class="btn waves-effect waves-light blue darken-1" href="/items/ver?item=${item._id}">
+                                    <i class="material-icons">remove_red_eye</i>
+                        </a>
+
+                        <button class="btn waves-effect boton_abrir_modal waves-light red darken-1 modal-trigger"
+                            data-target="modal_eliminar" item_id="${item._id}">
+                            <i class="material-icons">delete</i>
+                        </button>
+
+                    </td>
+                    </tr>`)
+                    item_agregado++
+                }
+                $('.boton_abrir_modal').click(function () {
+                    var id_item = $(this).attr('item_id');
+
+                    console.log(id_item);
+
+
+                    $.ajax({
+                        type: "GET",
+                        url: '/api/items/' + id_item,
+                        success: function (response) {
+                            console.log(response);
+                            $('#nombre_item').html('Tipo ' + response.bs)
+                            $('#descripcion').html(response.descripcion)
+                            $('#precio').html(response.precio_unitario.toFixed(
+                                2))
+                            $('#boton_eliminar').attr('item_id', response
+                                ._id)
+                        },
+                        error: function (jqXHR, textStatus, errorThrown, ) {
+                            console.log(jqXHR);
+                            console.log(textStatus);
+                            console.log(errorThrown);
+                        }
+                    });
+                })
+                $('#boton_eliminar').click(function () {
+                    var id_item = $(this).attr('item_id')
+                    console.log(id_item);
+
+                    $.ajax({
+                        type: "DELETE",
+                        url: '/api/items/' + id_item,
+                        success: function (response) {
+                            $('#tr_' + id_item).remove()
+                            $('#modal_eliminar').modal('close')
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(jqXHR);
+                            console.log(textStatus);
+                            console.log(errorThrown);
+                        }
+                    });
+                })
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+        })
+    })
+</script>
+
+<% include ../views_template_v2/dashboard_bot_2 %>

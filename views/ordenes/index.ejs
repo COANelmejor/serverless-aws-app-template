@@ -1,0 +1,208 @@
+<% include ../views_template_v2/dashboard_top %>
+
+<!-- row -->
+<div class="row tm-content-row tm-mt-big">
+    <div class="col-12">
+        <div class="bg-white tm-block h-100">
+            <div class="row">
+                <div class="col-6">
+                    <h2 class="tm-block-title">
+                        <h3 class="text-center">
+                            Órdenes
+                            <a href="/ordenes/nuevo" class="btn btn-success text-middle">
+                                <i class="material-icons">add_circle_outline</i>
+                            </a>
+                        </h3>
+                    </h2>
+                </div>
+                <div class="col-6">
+                    <div class="file-field input-field">
+                        <div class="">
+                            <button class="btn btn-outline-secondary" type="button" id="boton_buscar"><i
+                                    class="material-icons">search</i></button>
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input type="text" class="form-control" id="campo_buscar" placeholder="Buscar Órden"
+                                aria-label="Buscar Item" aria-describedby="button-addon2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped highlight responsive-table centered">
+                    <thead>
+                        <th class="text-center">NIT</th>
+                        <th class="text-center">Nombre</th>
+                        <th class="text-center">Número de Teléfono</th>
+                        <th class="text-center">Correo</th>
+                        <th class="text-center">Fecha Emisión</th>
+                        <th class="text-center">Moneda</th>
+                        <th class="text-center">Productos y Servicios</th>
+                        <th class="text-center">total</th>
+                        <th class="text-right"><i class="material-icons">build</i></th>
+                    </thead>
+                    <tbody id="body_table_orden">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<% include ../views_template_v2/dashboard_bot %>
+
+<script>
+    var orden_agregado = 0;
+
+    $(document).ready(function () {
+        console.log('YEY');
+
+
+        $.ajax({
+            method: "GET",
+            url: '/api/orden/?limit=100&skip=0',
+            success: function (response) {
+                $('#body_table_orden').html('')
+                for (let p = 0; p < response.length; p++) {
+                    const orden = response[p];
+                    $('#body_table_orden').append(` <tr
+                    id="tr_${orden_agregado}" value="${orden._id}" list=${orden_agregado}>
+                    <td class="text-center">
+                        ${orden.nit}
+                    </td>
+                    <td class="text-center">
+                        ${orden.nombre}
+                    </td>
+                    <td class="text-center">
+                        ${orden.telefono}
+                    </td>
+                    <td class="text-center">
+                        ${orden.email}
+                    </td>
+                    <td class="text-center">
+                        ${moment.unix(orden.fecha_emision).locale('ES').format('LLLL')}
+                    </td>
+                    <td class="text-center">
+                        ${orden.moneda}
+                    </td>
+                    <td class="text-center">
+                        ${JSON.parse(orden.items).length}
+                    </td>
+                    <td class="text-right">
+                        Q. ${orden.total.toFixed(2)}
+                    </td>
+                    <td class="text-right">
+                    <a class="btn btn-info" href="/ordenes/ver?orden=${orden._id}"><i
+                            class="material-icons">remove_red_eye</i></a>
+                    </td>
+                    </tr>`)
+                    orden_agregado++
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+        })
+
+        $('#boton_buscar').click(
+            buscar_orden
+        )
+        $('#campo_buscar').keyup(function (event) {
+            if (event.key == 'Enter') {
+                buscar_orden()
+            }
+        })
+
+
+        function buscar_orden() {
+            let orden = $('#campo_buscar').val();
+            $.ajax({
+                method: "GET",
+                url: '/api/orden/buscar/' + orden,
+                success: function (response) {
+                    $('#body_table_orden').html('')
+                    for (let p = 0; p < response.length; p++) {
+                        const orden = response[p];
+                        $('#body_table_orden').append(` <tr id="tr_${orden_agregado}" value="${orden._id}"
+                            list=${orden_agregado}>
+                            <td class="text-center">
+                                ${orden.nit}
+                            </td>
+                            <td class="text-center">
+                                ${orden.nombre}
+                            </td>
+                            <td>
+                                ${moment.unix(orden.fecha_emision).locale('ES').format('LLLL')}
+                            </td>
+                            <td>
+                                ${orden.moneda}
+                            </td>
+                            <td>
+                                ${JSON.parse(orden.items).length}
+                            </td>
+                            <td class="text-right">
+                                Q. ${orden.total.toFixed(2)}
+                            </td>
+                            <td class="text-right">
+                                <a class="btn btn-info" href="/ordenes/ver?orden=${orden._id}"><i
+                                        class="material-icons">remove_red_eye</i></a>
+                            </td>
+
+                            </tr>`)
+                        orden_agregado++
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $.ajax({
+                        method: "GET",
+                        url: '/api/orden/?limit=100&skip=0',
+                        success: function (response) {
+                            $('#body_table_orden').html('')
+                            for (let p = 0; p < response.length; p++) {
+                                const orden = response[p];
+                                $('#body_table_orden').append(` <tr
+            id="tr_${orden_agregado}" value="${orden._id}" list=${orden_agregado}>
+            <td class="text-center">
+                ${orden.nit}
+            </td>
+            <td class="text-center">
+                ${orden.nombre}
+            </td>
+            <td>
+                ${moment.unix(orden.fecha_emision).locale('ES').format('LLLL')}
+            </td>
+            <td>
+                ${orden.moneda}
+            </td>
+            <td>
+                ${JSON.parse(orden.items).length}
+            </td>
+            <td class="text-right">
+                Q. ${orden.total.toFixed(2)}
+            </td>
+            <td class="text-right">
+                <a class="btn btn-info" href="/ordenes/ver?orden=${orden._id}"><i
+                        class="material-icons">remove_red_eye</i></a>
+            </td>
+            </tr>`)
+                                orden_agregado++
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(jqXHR);
+                            console.log(textStatus);
+                            console.log(errorThrown);
+                        }
+                    })
+                }
+            })
+
+        }
+
+    })
+</script>
+
+<% include ../views_template_v2/dashboard_bot_2 %>

@@ -1,0 +1,158 @@
+<% include ../views_template_v2/dashboard_top %>
+
+<!-- row -->
+
+<div class="row tm-content-row tm-mt-big">
+    <div class="col-12">
+        <div class="bg-white tm-block h-100">
+            <input type="hidden" id="item_id" value="<%=item%>">
+            <div class="row">
+                <div class="col-6">
+                    <h2 class="tm-block-title">
+                        Ver item
+                        <button class="btn amber waves-effect waves-light darken-2 secondary-content"
+                            id="editar">Editar</button>
+                    </h2>
+                </div>
+                <div class="col-6">
+
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <th class="text-center">B/s</th>
+                        <th class="text-center">Descripción</th>
+                        <th class="text-center">Precio Unitario</th>
+                    </thead>
+                    <tbody id="body_items">
+                        <td class="text-center" id="item_bs">
+                            <div class="col s6 m6 s12">
+                                <p>
+                                    <label>
+                                        <input id="bos_bien" class="selector retirar_attr bien" value="bien"
+                                            name="new_item_bs" disabled required type="radio" />
+                                        <span for="bos_bien">Bien</span>
+                                    </label>
+                                </p>
+
+                            </div>
+                            <div class="col s6 m6 s12">
+
+                                <p>
+                                    <label>
+                                        <input id="bos_servicio" class="selector retirar_attr servicio"
+                                         value="servicio" name="new_item_bs" disabled required type="radio" />
+                                        <span for="bos_servicio">Servicio</span>
+                                    </label>
+                                </p>
+                            </div>
+                        </td>
+                        <td class="text-center" id="item_descripcion"></td>
+                        <td class="text-center" id="item_precio_unitario"></td>
+                    </tbody>
+                </table>
+                <div class="text-center" style="padding-top: 2rem;">
+                    <a class="waves-effect waves-light btn-large btn-block" disabled id="guardar">
+                        <i class="material-icons left">save</i>
+                        Guardar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 id="respuesta" class="text-center"></h4>
+
+<% include ../views_template_v2/dashboard_bot %>
+
+<script>
+    var item_agregado = 0;
+    var bs = '';
+
+    $(document).ready(function () {
+        console.log('YEY');
+
+        let item = $('#item_id').val()
+
+        $.ajax({
+            method: "GET",
+            url: '/api/items/' + item,
+            success: function (response) {
+                console.log(response);
+                var valor_radio = $('#bos_' + response.bs).attr('checked', true)
+
+                bs = response.bs;
+
+                $('.radio_' + response.bs).attr('checked', true);
+
+                $('#item_descripcion').html('<input class="selector" disabled type="text" value="' +
+                    response
+                    .descripcion + '" id="new_item_descripcion">')
+                $('#item_precio_unitario').html(
+                    '<div class="input-field"><i class="prefix" style="top: 0px;">Q.</i><input class="selector" disabled type="text" value="' +
+                    response
+                    .precio_unitario.toFixed(2) + '" id="new_item_precio_unitario"></div>')
+                $('#editar').click(function () {
+                    $('#guardar_info').toggle()
+
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+        })
+        $('#editar').click(function () {
+
+            if ($('.selector').attr('disabled')) {
+                $('.selector').removeAttr('disabled')
+                $('#guardar').removeAttr('disabled')
+            } else {
+                $('.selector').attr('disabled', true)
+                $('#guardar').attr('disabled', true)
+            }
+        })
+        $('.retirar_attr').click(function () {
+            bs = $(this).val()
+        })
+
+        $('#guardar').click(function () {
+            let body = {
+                bs: bs,
+                descripcion: $('#new_item_descripcion').val(),
+                precio_unitario: $('#new_item_precio_unitario').val()
+            }
+
+            $.ajax({
+                method: "PUT",
+                url: '/api/items/' + item,
+                data: body,
+                success: function (response) {
+                    console.log(response);
+                    console.log(response);
+                    $('#respuesta').html(
+                        '<i class="fas fa-check-square" style="color: #43a047"></i> Ítem editado con éxito.'
+                    )
+                    setTimeout(function () {
+                        location.href = "/items"
+                    }, 2000);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                    $('#respuesta').html(
+                        '<i class="fas fa-check-square" style="color: #e53935 "></i> Hubo un Error al editar el item, verifica los campos y vuelve a intentarlo'
+                    )
+                }
+            })
+
+        })
+
+    })
+</script>
+
+<% include ../views_template_v2/dashboard_bot_2 %>

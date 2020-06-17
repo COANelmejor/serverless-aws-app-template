@@ -1,0 +1,239 @@
+<% include ../views_template_v2/dashboard_top %>
+
+<!-- row -->
+
+<div class="row tm-content-row tm-mt-big">
+    <div class="col-12">
+        <div class="bg-white tm-block h-100">
+            <input type="hidden" id="orden_id" value="<%=orden%>">
+            <div class="row">
+                <div class="col-lg-6 text-center">
+                    <h2 class="tm-block-title">
+                        Ver Orden
+                    </h2>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+
+                    <thead>
+                        <th class="text-center">NIT</th>
+                        <th class="text-center">Nombre</th>
+                        <th class="text-center">Teléfono</th>
+                        <th class="text-center">Correo</th>
+
+                        <th class="text-center">Fecha Emisión</th>
+                        <th class="text-center">Moneda</th>
+                        <th class="text-center">Total</th>
+                    </thead>
+                    <tbody id="body_table_orden">
+                        <tr>
+                            <td class="text-center" id="nit"></td>
+                            <td class="text-center" id="nombre">
+                                <input type="hidden" id="id_orden" value="">
+                            </td>
+                            <td class="text-center" id="telefono"></td>
+                            <td class="text-center" id="email"></td>
+                            <td class="text-center" id="fecha_emision"></td>
+                            <td class="text-center" id="moneda"></td>
+                            <td class="text-right" id="total"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+
+                    <thead>
+                        <th class="text-center">B/s</th>
+                        <th class="text-center">Descripción</th>
+                        <th class="text-center">Precio Unitario</th>
+                    </thead>
+                    <tbody id="body_items">
+                    </tbody>
+                </table>
+            </div>
+            <div class="row text-center" style="padding-top: 10px;">
+                <div class="col l6 m6 s12">
+                    <form enctype="application/x-www-form-urlencoded" action="/api/orden/subirpdf/<%=orden%>"
+                        method="post">
+                        <div class="file-field input-field">
+                            <div class="btn waves-effect waves-light btn-success red darken-1">
+                                <span>PDF</span>
+                                <input name="facepdf" type="file" accept="application/pdf">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Subir Archivo PDF">
+                            </div>
+                        </div>
+                        <button class="btn waves-effect waves-light" type="submit" id="guardar_pdf">Guardar
+                            <i class="material-icons left">save</i>
+                        </button>
+                    </form>
+                    <h4 class="text-center estado_archivo_pdf" id=""></h4>
+                </div>
+                <div class="col l6 m6 s12">
+                    <form enctype="application/x-www-form-urlencoded" action="/api/orden/subirxml/<%=orden%>">
+                        <div class="file-field input-field">
+                            <div class="btn waves-effect waves-light btn-success green darken-1">
+                                <span>XML</span>
+                                <input name="facexml" type="file" accept="text/xml">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Subir Archivo XML">
+                            </div>
+                        </div>
+                        <button class="btn waves-effect waves-light" type="submit" id="guardar_xml">Guardar
+                            <i class="material-icons left">save</i>
+                        </button>
+                    </form>
+                    <h4 class="text-center estado_archivo_xml"></h4>
+                </div>
+                <div class="col l12 m12 s12">
+                    <div class="row">
+                        <div class="col l3 m6 s12" id="enviar_wa"></div>
+                        <div class="col l3 m6 s12" id="enviar_ses"></div>
+                    </div>
+                </div>
+                <div class="col l6 m6 s12"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<% include ../views_template_v2/dashboard_bot %>
+
+<script>
+    var orden_agregado = 0;
+
+    $(document).ready(function () {
+        console.log('YEY');
+
+        let orden = $('#orden_id').val()
+
+        $.ajax({
+            method: "GET",
+            url: '/api/orden/' + orden,
+            success: function (response) {
+                console.log(response);
+                var id_orden = response._id;
+                $('#nit').html(response.nit)
+                $('#nombre').html(response.nombre)
+                $('#telefono').html(response.telefono)
+                $('#email').html(response.email)
+                $('#fecha_emision').html(moment.unix(response.fecha_emision).locale('ES').format(
+                    'LLLL'))
+                $('#moneda').html(response.moneda)
+                $('#total').html('Q.' + response.total)
+                if ((response.telefono != undefined) && (response.pdf != undefined)) {
+                    $('#enviar_wa').html(`
+                    <a class="waves-effect teal lighten-5 waves-light btn btn-block"
+                        style="color: #43a047" target="_blank"
+                        href="https://wa.me/${response.telefono}?text=Su%20factura%20está%20lista.🧾%0APuede%20descargarla%20en:%0A%0A${response.pdf.location}">
+                        <i class="fab fa-whatsapp"></i>
+                        <span style="position: relative;bottom: 2px;"> Enviar
+                            por WhatsApp</span></a>`)
+                }
+
+                console.log(id_orden);
+
+                $(function () {
+                    $('button[type=submit]').click(function (event) {
+                        event.preventDefault();
+                        // retrieve form element
+                        var form = this.form;
+                        // prepare data
+                        var data = new FormData(form);
+                        // get url
+                        var url = form.action;
+                        console.log(url);
+                        console.log(url.split('/')[5]);
+                        
+                        if (url.split('/')[5] == 'subirpdf') {
+                            $('.estado_archivo_pdf').html(
+                                '<i class="fas fa-spinner fa-pulse"></i> Guardando Archivo'
+                            )
+                        } else {
+                            $('.estado_archivo_xml').html(
+                                '<i class="fas fa-spinner fa-pulse"></i> Guardando Archivo'
+                            )
+                        }
+
+                        // send request
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            data: data,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                if (url.split('/')[5] == 'subirpdf') {
+                                    $('.estado_archivo_pdf').html(`<i class="fas fa-check-square" style="color: #43a047"></i> Archivo Guardado con éxito <br>`)
+                                    if (response.orden.telefono != undefined) {
+                                        $('#enviar_wa').html(`
+                                         <a class="waves-effect teal lighten-5 waves-light btn btn-block" style="color: #43a047"
+                                             target="_blank" href="https://wa.me/${response.orden.telefono}?text=Su%20factura%20está%20lista.🧾%0APuede%20descargarla%20en:%0A%0A${response.archivo_subido.location}">
+                                            <i class="fab fa-whatsapp"></i>
+                                             <span style="position: relative;bottom: 2px;"> Enviar por WhatsApp</span></a>`)
+                                    }
+                                } else {
+                                    $('.estado_archivo_xml').html(
+                                        '<i class="fas fa-check-square" style="color: #43a047"></i> Archivo Guardado con éxito <br><a class="waves-effect teal lighten-5 waves-light btn" style="color: #43a047"><i class="fab fa-whatsapp"></i><span style="position: relative;bottom: 2px;"> Enviar por WhatsApp</span></a>'
+                                    )
+
+                                }
+                            },
+                            error: function (jqXHR, textStatus,
+                                errorThrown) {
+                                console.log(jqXHR);
+                                console.log(textStatus);
+                                console.log(errorThrown);
+                                if (url.split('/')[5] == 'subirpdf') {
+                                    $('.estado_archivo_pdf').html(
+                                        '<i class="fas fa-check-square" style="color: #e53935 "></i> Hubo un Error al subir el archivo, verifica los campos y vuelve a intentarlo '
+                                    )
+                                } else {
+                                    $('.estado_archivo_xml').html(
+                                        '<i class="fas fa-check-square" style = "color: #e53935 " ></i> Hubo un Error al subir el archivo, verifica los campos y vuelve a intentarlo '
+                                    )
+
+                                }
+                            }
+
+                        });
+
+                    });
+                });
+
+
+                const items = JSON.parse(response.items)
+
+                for (const i in items) {
+                    if (items.hasOwnProperty(i)) {
+                        const item = items[i];
+                        $('#body_items').append(`
+                        <tr>
+                            <td>
+                            ${item.bs}
+                            </td>
+                            <td>${item.descripcion}</td>
+
+                            <td class="text-right">Q. ${parseFloat(item.precio_unitario).toFixed(2)}</td>
+                        </tr>
+
+                        `)
+                    }
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+        })
+
+    })
+</script>
+
+<% include ../views_template_v2/dashboard_bot_2 %>
