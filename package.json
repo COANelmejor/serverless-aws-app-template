@@ -1,9 +1,10 @@
 {
-  "name": "supermercado.gt",
-  "version": "1.0.0",
+  "name": "dte-ff",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "sls offline --skipCacheInvalidation"
+    "start": "node ./bin/www",
+    "slsoff" : "sls offline --skipCacheInvalidation"
   },
   "dependencies": {
     "aws-sdk": "^2.618.0",

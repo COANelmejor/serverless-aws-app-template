@@ -18,8 +18,7 @@ const MongoStore = require('connect-mongo')(session);
 var mongoose = require('mongoose');
 var userDB = require('./models/userModel');
 
-// [{Modificar - Conexión a la Base de Datos}]
-mongoose.connect('mongodb+srv://usuario:contrasenia@hostmongodb/db?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://testmongo:01123581321@sandboxtestinganddevelop-vocxz.mongodb.net/dte?retryWrites=true&w=majority', {
   useNewUrlParser: true
 });
 mongoose.Promise = global.Promise;
@@ -68,7 +67,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 app.use(session({
-  secret: 'tingandlopvocxzdeve',
+  secret: '01123581321',
   resave: false,
   saveUninitialized: true,
   store: new MongoStore({
@@ -120,6 +119,12 @@ require('./routes')(app)
 app.use(function(req, res, next) {
   next(createError(404));
 });
+
+// app.use(function (err, req, res, next) {
+//   // render the error page
+//   res.status(err.status || 500).send(err);
+
+// });
 
 // error handler
 app.use(function(err, req, res, next) {
