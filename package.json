@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "slsoff" : "sls offline --skipCacheInvalidation"
+    "slsoff": "sls offline --skipCacheInvalidation"
   },
   "dependencies": {
     "aws-sdk": "^2.618.0",
@@ -17,7 +17,7 @@
     "express-session": "^1.17.0",
     "http-errors": "~1.6.3",
     "moment": "^2.24.0",
-    "mongoose": "^5.8.11",
+    "mongoose": "^5.13.2",
     "mongoose-autopopulate": "^0.12.0",
     "morgan": "~1.9.1",
     "multer": "^1.4.2",
